@@ -6,6 +6,8 @@ Param(
     [string] $CloudEnvironment = 'AzureCloud'
 )
 
+Write-Warning -Message "This function will be renamed in a future release. Use Sync-ALZPolicies instead."
+
 if ($definitionsRootFolder -eq "") {
     if ($null -eq $env:PAC_DEFINITIONS_FOLDER) {
         $definitionsRootFolder = "$PSScriptRoot/../../Definitions"
