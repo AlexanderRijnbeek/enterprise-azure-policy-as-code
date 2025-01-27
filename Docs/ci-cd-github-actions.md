@@ -1,25 +1,33 @@
 # Github Actions
 
-The starter kit contains a sample pipeline to use GitHub Actions to deploy Enterprise Policy as Code. It features a review process and is driven by pull requests and approvals.
+This page covers the specifics for the GitHub Actions pipelines created by using the Starter Kit. Pipelines can be further customized based on requirements. We have revised our approach to GitHub Actions simplifying the process and make it easier to understand. The new approach is documented below and is included in the starter kit with v8.5 and later.
 
-We have revised our approach to GitHub Actions simplifying the process and make it easier to understand. The new approach is documented below and is included in the starter kit with v8.5 and later.
+> [!Note]
+> To find all examples of GitHub Actions Pipelines, please visit [StarterKit/Pipelines/GitHubActions](https://github.com/Azure/enterprise-azure-policy-as-code/tree/main/StarterKit/Pipelines/AzureDevOps).
 
-The previous version is still available in the starter kit in folder `Legacy` and the [documentation is retained](#previous-cicd-workflow----legacy) after the documentation for the new approach.
+The previous version is still available in the starter kit in folder `Legacy` and the [documentation is retained](#legacy-github-cicd-workflows) at the end of this page.
 
 ## Setup in GitHub
 
 ### Create GitHub Deployment Environments
 
-You will need one [GitHub deployment environment](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment) for the `epac-dev` workflow and three environments each for your epac-prod or tenant workflows. This documentation assumes the include starter kit pipelines.
+Create two labels in the project called `PolicyDeployment` and `RoleDeployment`. Instructions to create new labels are [here](https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels#creating-a-label).
 
-| Environment | Purpose | [App Registration](./ci-cd-app-registrations.md) (SPN) |
+You will need one [GitHub deployment environment](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment) for the `epac-dev` workflow and three environments each for your epac-prod or tenant workflows. This documentation assumes the use of the included starter kit pipelines.
+
+| Environment | Purpose | [App Registration](ci-cd-app-registrations.md) (SPN) |
 |---|---|---|
 | EPAC-DEV | Plan and deploy to `epac-dev` | ci-cd-epac-dev-owner |
 | TENANT-PLAN | Build deployment plan for `tenant` | ci-cd-root-policy-reader |
 | TENANT-DEPLOY-POLICY | Deploy Policy resources for `tenant` | ci-cd-root-policy-contributor |
 | TENANT-DEPLOY-ROLES | Deploy Roles for `tenant` | ci-cd-root-user-assignments |
 
-For each environment, [add to the environment secrets](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#environment-secrets) for the tenant id, client id and client secret for the SPN. The secrets must be named `TENANT_ID`, `CLIENT_ID` and `CLIENT_SECRET` respectively.
+[Add the environment secrets for](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#environment-secrets) the Service Principal listed below to the GitHub repository. These are used to authenticate to Azure, and should be added to each Environment listed above.
+
+| Secret Name | Value |
+|---------|---------|
+| AZURE_CLIENT_ID | Application ID for SPN |
+| AZURE_TENANT_ID | Azure AD Tenant |
 
 ### Hardening each Environment
 
@@ -28,23 +36,7 @@ For each environment, [add to the environment secrets](https://docs.github.com/e
 * [Restrict branch](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#deployment-branches-and-tags) to `main` branch for TENANT-DEPLOY-POLICY and TENANT-DEPLOY-ROLES environments.
 * Do not [allow administrators to bypass configured protection rules](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#allow-administrators-to-bypass-configured-protection-rules) for TENANT-DEPLOY-POLICY and TENANT-DEPLOY-ROLES environments.
 
-## New GitHub Workflows
-
-Each of the workflows has three (3) jobs:
-* `Build` - Builds the deployment plan
-* `Deploy Policy` - Deploys the policy plan
-* `Deploy Roles` - Deploys the role plan
-
-The starter kit contains the following workflows:
-
-* `epac-dev.yaml` is the workflow for the `epac-dev` environment. It is triggered on push to any `feature/**` branch.
-* `tenant.yaml` is the workflow for the `epac-prod` or `tenant` environments. It is triggered on PR closed to the `main` branch.
-
-## Testing your Workflows
-
-To test the actions make a change to a file in the definitions folder.
-
-## Previous CI/CD Workflow -- Legacy
+## Legacy GitHub CI/CD Workflows
 
 This section is retained from the previous documentation to enable you to continue using the previous approach. It is recommended that you migrate to the new approach as soon as possible.
 
@@ -62,22 +54,17 @@ This section is retained from the previous documentation to enable you to contin
 8. For role changes when the PR is approved again the same action runs - this time using the `Deploy-RolesPlan` for deployment.
 9. When complete the PR is closed and the branch containing the plan is deleted.
 
-!!! note
-    This is a sample method of deploying policy and role changes - feel free to modify it to suit your environment and contribute to this project if you want to share an update.
-
 ### Setup in GitHub -- Legacy
 
 There are some steps to be performed in GitHub to ensure the action runs correctly.
 
 1. Create two labels in the project called `PolicyDeployment` and `RoleDeployment`. Instructions to create new labels are [here](https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels#creating-a-label).
-2. Create secrets representing an SPN in GitHub for the repository as below - these are used to authenticate to Azure
+2. An Environment should be created for each [SPN created](Docs/ci-cd-app-registrations.md)
 
     | Secret Name | Value |
-    |---|---|
-    | CLIENT_ID | Application ID for SPN |
-    | CLIENT_SECRET | Client secret |
-    | TENANT_ID | Azure AD Tenant |
-    | SUBSCRIPTION_ID | Any subscription ID. Used to login but not in the process |
+    |---------|---------|
+    | AZURE_CLIENT_ID | Application ID for SPN |
+    | AZURE_TENANT_ID | Azure AD Tenant |
 
 3. In the `.github\workflows\build.yaml` and `.github\workflows\deploy.yaml` file updated the `env:` section as below.
 

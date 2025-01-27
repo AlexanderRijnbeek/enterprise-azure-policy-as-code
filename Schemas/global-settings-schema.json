@@ -1,7 +1,11 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "The schema to verify this document against."
+        },
         "pacOwnerId": {
             "type": "string"
         },
@@ -23,10 +27,38 @@
                         "tenantId": {
                             "type": "string"
                         },
+                        "deployedBy": {
+                            "type": "string"
+                        },
+                        "managedIdentityLocation": {
+                            "type": "string"
+                        },
+                        "managingTenant": {
+                            "type": "array",
+                            "item": [
+                                {
+                                    "managingTenantId": "string"
+                                },
+                                {
+                                    "managingTenantRootScopes": "array"
+                                }
+                            ],
+                            "additionalProperties": false,
+                            "required": [
+                                "managingTenantId",
+                                "managingTenantRootScopes"
+                            ]
+                        },
                         "deploymentRootScope": {
                             "type": "string"
                         },
-                        "inheritedDefinitionsScopes": {
+                        "skipResourceValidationForExemptions": {
+                            "type": "boolean"
+                        },
+                        "defaultContext": {
+                            "type": "string"
+                        },
+                        "globalNotScopes": {
                             "type": "array",
                             "items": [
                                 {
@@ -44,10 +76,10 @@
                                         "ownedOnly"
                                     ]
                                 },
-                                "includeResourceGroups": {
+                                "keepDfcSecurityAssignments": {
                                     "type": "boolean"
                                 },
-                                "keepDfcSecurityAssignments": {
+                                "doNotDisableDeprecatedPolicies": {
                                     "type": "boolean"
                                 },
                                 "excludedScopes": {
@@ -82,16 +114,14 @@
                                         }
                                     ]
                                 },
-                                "deleteExpiredExemptions": {
-                                    "type": "boolean"
-                                },
-                                "deleteOrphanedExemptions": {
+                                "excludeSubscriptions": {
                                     "type": "boolean"
                                 }
                             },
                             "additionalProperties": false,
                             "required": [
-                                "strategy"
+                                "strategy",
+                                "keepDfcSecurityAssignments"
                             ]
                         }
                     },
@@ -100,31 +130,12 @@
                         "pacSelector",
                         "cloud",
                         "tenantId",
-                        "deploymentRootScope"
+                        "deploymentRootScope",
+                        "managedIdentityLocation",
+                        "desiredState"
                     ]
                 }
             ]
-        },
-        "managedIdentityLocations": {
-            "type": "object",
-            "patternProperties": {
-                "^*$": {
-                    "type": "string"
-                }
-            }
-        },
-        "globalNotScopes": {
-            "type": "object",
-            "patternProperties": {
-                "^*$": {
-                    "type": "array",
-                    "items": [
-                        {
-                            "type": "string"
-                        }
-                    ]
-                }
-            }
         }
     },
     "additionalProperties": false,

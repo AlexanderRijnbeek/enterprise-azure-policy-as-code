@@ -47,7 +47,7 @@ function Confirm-ActiveAzExemptions {
             $metadata = $null
         }
 
-        $exemptionObj = [pscustomobject][ordered]@{
+        $exemptionObj = [ordered]@{
             name                         = $name
             displayName                  = $exemption.displayName
             description                  = $exemption.description
@@ -80,7 +80,7 @@ function Confirm-ActiveAzExemptions {
         all           = $allExemptions
         active        = $activeExemptions
         expiresInDays = $expiringExemptions # Subset of active
-        orphaned      = $orphanedExemptions # Orpahned trumps expired
+        orphaned      = $orphanedExemptions # Orphaned trumps expired
         expired       = $expiredExemptions
     }
 
